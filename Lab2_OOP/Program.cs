@@ -1,6 +1,9 @@
-﻿using System;
+﻿using Microsoft.VisualBasic;
+using System;
 using System.Net;
 using System.Numerics;
+using System.Text;
+using System.Text.Json;
 
 namespace Lab2_OOP
 {
@@ -26,9 +29,19 @@ namespace Lab2_OOP
             }
         }
 
+        static string makeSyncRequest(string uri)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, uri);
+            var response = new HttpClient().Send(request);
+            response.EnsureSuccessStatusCode();
+            var stream = response.Content.ReadAsStream();
+            StreamReader streamReader = new StreamReader(stream);
+            return streamReader.ReadToEnd();
+        }
+
         static void Main(string[] args)
         {
-            List<Task<string>> strings =
+            /*List<Task<string>> strings =
             [
                 makeRequest("http://example.com/").Result?.ReadAsStringAsync(),
                 makeRequest("http://ya.ru/").Result?.ReadAsStringAsync(),
@@ -39,7 +52,19 @@ namespace Lab2_OOP
             foreach (var task in strings)
             {
                 Console.WriteLine(task.Result);
-            }
+            }*/
+
+            var task = makeRequest("http://example.com/").Result?.ReadAsStringAsync();
+            task.Wait();
+            Console.WriteLine(task.Result);
+            task = makeRequest("http://ya.ru/").Result?.ReadAsStringAsync();
+            task.Wait();
+            Console.WriteLine(task.Result);
+            task = makeRequest("https://google.com/").Result?.ReadAsStringAsync();
+            task.Wait();
+            Console.WriteLine(task.Result);
+
+            /*Console.WriteLine(makeSyncRequest("https://google.com/"));*/
         }
     }
 }
